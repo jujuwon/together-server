@@ -5,24 +5,16 @@ server:
     encoding:
       charset: UTF-8
       force: true
-spring:
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/together
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-  jpa:
-    database: mysql
-    open-in-view: true
-    hibernate:
-      ddl-auto: create
-      use-new-id-generator-mappings: false
-    properties:
-      hibernate:
-        show_sql: false
-        format_sql: true
-        highlight_sql: true
 
 logging:
   level:
     root: info
+
+---
+spring:
+  profiles:
+    active: local
+---
+spring:
+  profiles:
+    active: prod
