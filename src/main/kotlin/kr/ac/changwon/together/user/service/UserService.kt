@@ -39,7 +39,7 @@ class UserService(
         userRepository.findByIdOrNull(id)
             ?.update(
                 nickname = nickname,
-                profileImage = profileImage,
+                profileImgUrl = profileImgUrl,
                 introduce = introduce
             ) ?: throw CustomException(ErrorCode.NOT_FOUND_USER)
     }

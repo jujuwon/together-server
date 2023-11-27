@@ -10,7 +10,7 @@ data class ResUserPageInfo(
     val nickname: String,
     // TODO
     @ApiModelProperty(value = "프로필 이미지 URL")
-    val profileImage: String,
+    val profileImgUrl: String,
     @ApiModelProperty(value = "소개글")
     val introduce: String,
     @ApiModelProperty(value = "게시물 수")
@@ -27,7 +27,7 @@ data class ResUserPageInfo(
             ResUserPageInfo(
                 email = user.email,
                 nickname = user.nickname,
-                profileImage = user.profileImage,
+                profileImgUrl = user.profileImgUrl,
                 introduce = user.introduce ?: "",
                 articleCount = articles.size,
                 followingCount = followingCount,

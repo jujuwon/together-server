@@ -9,7 +9,7 @@ data class ReqUpdateUser(
     val nickname: String,
     @ApiModelProperty(value = "프로필 이미지 URL")
     @field:NotNull
-    val profileImage: String,
+    val profileImgUrl: String,
     @ApiModelProperty(value = "소개글")
     @field:NotNull
     val introduce: String

@@ -6,7 +6,7 @@ data class ResUserInfo(
     val email: String,
     val name: String,
     val nickname: String,
-    val profileImage: String?,
+    val profileImgUrl: String?,
 ) {
     companion object {
         fun of(user: User) = with(user) {
@@ -14,7 +14,7 @@ data class ResUserInfo(
                 email = email,
                 name = name,
                 nickname = nickname,
-                profileImage = profileImage,
+                profileImgUrl = profileImgUrl,
             )
         }
     }

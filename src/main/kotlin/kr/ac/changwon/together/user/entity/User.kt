@@ -13,14 +13,14 @@ class User(
     @Column
     val name: String,
     nickname: String,
-    profileImage: String = "base_profile.png"
+    profileImgUrl: String = "base_profile.png"
 ) : BaseTimeEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
 
     @Column
-    var profileImage: String = profileImage
+    var profileImgUrl: String = profileImgUrl
         protected set
 
     @Column
@@ -38,9 +38,9 @@ class User(
     @OneToMany(mappedBy = "user")
     val posts: MutableList<Post> = mutableListOf()
 
-    fun update(nickname: String, profileImage: String, introduce: String) {
+    fun update(nickname: String, profileImgUrl: String, introduce: String) {
         this.nickname = nickname
-        this.profileImage = profileImage
+        this.profileImgUrl = profileImgUrl
         this.introduce = introduce
     }
 }
