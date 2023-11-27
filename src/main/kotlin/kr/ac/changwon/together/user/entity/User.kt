@@ -1,6 +1,7 @@
 package kr.ac.changwon.together.user.entity
 
 import kr.ac.changwon.together.common.entity.BaseTimeEntity
+import kr.ac.changwon.together.post.entity.Post
 import javax.persistence.*
 
 @Entity
@@ -33,6 +34,9 @@ class User(
     // TODO 팔로잉/팔로워 연관관계 체크하기
     @OneToMany(mappedBy = "user")
     val following: MutableSet<Follow> = mutableSetOf()
+
+    @OneToMany(mappedBy = "user")
+    val posts: MutableList<Post> = mutableListOf()
 
     fun update(nickname: String, profileImage: String, introduce: String) {
         this.nickname = nickname
