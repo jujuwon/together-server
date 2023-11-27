@@ -1,7 +1,6 @@
 package kr.ac.changwon.together.user.entity
 
 import kr.ac.changwon.together.common.entity.BaseTimeEntity
-import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import javax.persistence.*
 
 @Entity
@@ -13,32 +12,31 @@ class User(
     @Column
     val name: String,
     nickname: String,
+    profileImage: String = "base_profile.png"
 ) : BaseTimeEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
 
     @Column
-    var profileImage: String? = null
-        private set
+    var profileImage: String = profileImage
+        protected set
 
     @Column
     var introduce: String? = null
-        private set
+        protected set
 
     @Column
     var nickname: String = nickname
-        private set
+        protected set
 
-    fun updateProfileImage(profileImage: String) {
-        this.profileImage = profileImage
-    }
+    // TODO 팔로잉/팔로워 연관관계 체크하기
+    @OneToMany(mappedBy = "user")
+    val following: MutableSet<Follow> = mutableSetOf()
 
-    fun updateIntroduce(introduce: String) {
-        this.introduce = introduce
-    }
-
-    fun updateNickname(nickname: String) {
+    fun update(nickname: String, profileImage: String, introduce: String) {
         this.nickname = nickname
+        this.profileImage = profileImage
+        this.introduce = introduce
     }
 }
