@@ -8,7 +8,6 @@ data class ResUserPageInfo(
     val email: String,
     @ApiModelProperty(value = "닉네임")
     val nickname: String,
-    // TODO
     @ApiModelProperty(value = "프로필 이미지 URL")
     val profileImgUrl: String,
     @ApiModelProperty(value = "소개글")
@@ -36,8 +35,3 @@ data class ResUserPageInfo(
             )
     }
 }
-
-data class Articles(
-    val id: Long,
-    val image: String,
-)

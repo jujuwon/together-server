@@ -9,6 +9,7 @@ import kr.ac.changwon.together.user.vo.ResUserPageInfo
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.userdetails.User
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import javax.validation.Valid
 
 @Api(tags = ["회원 API"])
@@ -24,7 +25,11 @@ class UserController(
 
     @ApiOperation(value = "사용자 화면 - 프로필 편집", notes = "로그인한 사용자의 정보를 수정합니다.")
     @PatchMapping("/info")
-    fun update(@AuthenticationPrincipal user: User, @Valid @RequestBody req: ReqUpdateUser): RestApiResponse<Unit> {
-        return RestApiResponse.success(service.updateUserInfo(id = user.username.toLong(), req = req))
-    }
+    fun update(@AuthenticationPrincipal user: User, @Valid @RequestBody req: ReqUpdateUser): RestApiResponse<Unit> =
+        RestApiResponse.success(service.updateUserInfo(id = user.username.toLong(), req = req))
+
+    @ApiOperation(value = "사용자 화면 - 프로필 편집 (이미지 업로드)", notes = "로그인한 사용자의 프로필 사진을 업로드합니다.")
+    @PostMapping("/info/profile-image")
+    fun uploadProfileImage(@AuthenticationPrincipal user: User, @RequestPart file: MultipartFile) =
+        RestApiResponse.success(service.uploadProfileImage(id = user.username.toLong(), file = file))
 }

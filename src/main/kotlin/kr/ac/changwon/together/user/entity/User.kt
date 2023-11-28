@@ -38,9 +38,12 @@ class User(
     @OneToMany(mappedBy = "user")
     val posts: MutableList<Post> = mutableListOf()
 
-    fun update(nickname: String, profileImgUrl: String, introduce: String) {
+    fun updateInfo(nickname: String, introduce: String) {
         this.nickname = nickname
-        this.profileImgUrl = profileImgUrl
         this.introduce = introduce
+    }
+
+    fun updateProfileImgUrl(profileImgUrl: String) {
+        this.profileImgUrl = profileImgUrl
     }
 }

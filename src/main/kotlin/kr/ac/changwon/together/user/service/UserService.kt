@@ -3,18 +3,22 @@ package kr.ac.changwon.together.user.service
 import kr.ac.changwon.together.auth.vo.ResUserInfo
 import kr.ac.changwon.together.common.coded.ErrorCode
 import kr.ac.changwon.together.common.exception.CustomException
+import kr.ac.changwon.together.common.util.ImageUtil
 import kr.ac.changwon.together.user.repository.FollowRepository
 import kr.ac.changwon.together.user.repository.UserRepository
 import kr.ac.changwon.together.user.vo.ReqUpdateUser
+import kr.ac.changwon.together.user.vo.ResProfileImgUrl
 import kr.ac.changwon.together.user.vo.ResUserPageInfo
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.multipart.MultipartFile
 
 @Service
 class UserService(
     private val userRepository: UserRepository,
-    private val followRepository: FollowRepository
+    private val followRepository: FollowRepository,
+    private val imageUtil: ImageUtil
 ) {
     fun getUserInfo(id: Long): ResUserInfo =
         userRepository.findByIdOrNull(id)?.let { ResUserInfo.of(it) }
@@ -30,17 +34,25 @@ class UserService(
             user = user,
             followingCount = user.following.size,
             followerCount = followerCount,
-            articles = listOf()
+            articles = listOf() // TODO
         )
     }
 
     @Transactional
     fun updateUserInfo(id: Long, req: ReqUpdateUser) = with(req) {
         userRepository.findByIdOrNull(id)
-            ?.update(
+            ?.updateInfo(
                 nickname = nickname,
-                profileImgUrl = profileImgUrl,
                 introduce = introduce
             ) ?: throw CustomException(ErrorCode.NOT_FOUND_USER)
+    }
+
+    @Transactional
+    fun uploadProfileImage(id: Long, file: MultipartFile): ResProfileImgUrl {
+        return userRepository.findByIdOrNull(id)
+            ?.let {
+                it.updateProfileImgUrl(profileImgUrl = imageUtil.upload(file))
+                ResProfileImgUrl(profileImgUrl = it.profileImgUrl)
+            } ?: throw CustomException(ErrorCode.NOT_FOUND_USER)
     }
 }
