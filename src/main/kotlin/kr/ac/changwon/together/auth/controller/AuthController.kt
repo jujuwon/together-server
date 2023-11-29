@@ -16,12 +16,12 @@ import javax.validation.Valid
 class AuthController(
     private val service: AuthService
 ) {
-    @ApiOperation(value = "회원가입", notes = "회원가입 성공시 JWT를 반환합니다.")
+    @ApiOperation(value = "회원가입 (부분완료) 기본 이미지 등록 필요", notes = "회원가입 성공시 JWT를 반환합니다.")
     @PostMapping("/sign-up")
     fun signUp(@Valid @RequestBody req: ReqSignUp): RestApiResponse<ResLoginToken> =
         RestApiResponse.success(service.signUp(req = req))
 
-    @ApiOperation(value = "로그인", notes = "로그인 성공시 JWT를 반환합니다.")
+    @ApiOperation(value = "로그인 (완료)", notes = "로그인 성공시 JWT를 반환합니다.")
     @GetMapping("/sign-in")
     fun signIn(@Valid req: ReqSignIn): RestApiResponse<ResLoginToken> =
         RestApiResponse.success(service.signIn(req = req))
