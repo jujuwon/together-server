@@ -5,14 +5,11 @@ import io.swagger.annotations.ApiOperation
 import kr.ac.changwon.together.common.vo.RestApiResponse
 import kr.ac.changwon.together.post.service.PostService
 import kr.ac.changwon.together.post.vo.ReqCreatePost
+import kr.ac.changwon.together.post.vo.ResPostImgUrl
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.userdetails.User
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import javax.validation.Valid
 
 @Api(tags = ["게시글 API"])
@@ -21,6 +18,14 @@ import javax.validation.Valid
 class PostController(
     private val postService: PostService
 ) {
+
+    @ApiOperation(value = "게시글 이미지 업로드", notes = "게시글에 들어갈 이미지를 업로드합니다.")
+    @PostMapping("/image")
+    fun uploadImage(
+        @AuthenticationPrincipal user: User,
+        @RequestPart file: MultipartFile
+    ): RestApiResponse<ResPostImgUrl> =
+        RestApiResponse.success(postService.uploadImage(id = user.username.toLong(), file = file))
 
     @ApiOperation(value = "게시글 작성", notes = "게시글을 작성합니다.")
     @PostMapping
@@ -31,4 +36,16 @@ class PostController(
     @GetMapping
     fun findList(userId: Long) =
         RestApiResponse.success(postService.retrieve(userId = userId))
+
+    @ApiOperation(value = "게시글 상세 조회", notes = "특정 게시글의 상세 내용을 조회합니다.")
+    @GetMapping
+    fun get() {
+        // TODO
+    }
+
+    @ApiOperation(value = "댓글 작성", notes = "댓글을 작성합니다.")
+    @PostMapping
+    fun comment() {
+        // TODO
+    }
 }

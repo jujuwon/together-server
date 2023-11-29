@@ -3,7 +3,7 @@ package kr.ac.changwon.together.user.service
 import kr.ac.changwon.together.auth.vo.ResUserInfo
 import kr.ac.changwon.together.common.coded.ErrorCode
 import kr.ac.changwon.together.common.exception.CustomException
-import kr.ac.changwon.together.common.util.ImageUtil
+import kr.ac.changwon.together.common.util.ImageUploader
 import kr.ac.changwon.together.user.repository.FollowRepository
 import kr.ac.changwon.together.user.repository.UserRepository
 import kr.ac.changwon.together.user.vo.ReqUpdateUser
@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile
 class UserService(
     private val userRepository: UserRepository,
     private val followRepository: FollowRepository,
-    private val imageUtil: ImageUtil
+    private val imageUploader: ImageUploader
 ) {
     fun getUserInfo(id: Long): ResUserInfo =
         userRepository.findByIdOrNull(id)?.let { ResUserInfo.of(it) }
@@ -51,7 +51,7 @@ class UserService(
     fun uploadProfileImage(id: Long, file: MultipartFile): ResProfileImgUrl {
         return userRepository.findByIdOrNull(id)
             ?.let {
-                it.updateProfileImgUrl(profileImgUrl = imageUtil.upload(file))
+                it.updateProfileImgUrl(profileImgUrl = imageUploader.upload(file))
                 ResProfileImgUrl(profileImgUrl = it.profileImgUrl)
             } ?: throw CustomException(ErrorCode.NOT_FOUND_USER)
     }

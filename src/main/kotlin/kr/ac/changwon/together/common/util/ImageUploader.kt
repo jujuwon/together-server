@@ -12,7 +12,7 @@ import java.io.ByteArrayInputStream
 import java.util.*
 
 @Component
-class ImageUtil(
+class ImageUploader(
     private val client: AmazonS3Client
 ) {
 
