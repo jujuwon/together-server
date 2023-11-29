@@ -6,6 +6,7 @@ import kr.ac.changwon.together.common.exception.CustomException
 import kr.ac.changwon.together.common.util.ImageUploader
 import kr.ac.changwon.together.user.repository.FollowRepository
 import kr.ac.changwon.together.user.repository.UserRepository
+import kr.ac.changwon.together.user.vo.PostVo
 import kr.ac.changwon.together.user.vo.ReqUpdateUser
 import kr.ac.changwon.together.user.vo.ResProfileImgUrl
 import kr.ac.changwon.together.user.vo.ResUserPageInfo
@@ -34,7 +35,12 @@ class UserService(
             user = user,
             followingCount = user.following.size,
             followerCount = followerCount,
-            articles = listOf() // TODO
+            posts = user.posts.map {
+                PostVo(
+                    id = it.id ?: throw CustomException(ErrorCode.INVALID_POST_ID),
+                    imgUrl = it.imgUrl
+                )
+            }
         )
     }
 

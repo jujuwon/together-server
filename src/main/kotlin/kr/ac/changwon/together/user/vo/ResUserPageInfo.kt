@@ -13,25 +13,25 @@ data class ResUserPageInfo(
     @ApiModelProperty(value = "소개글")
     val introduce: String,
     @ApiModelProperty(value = "게시물 수")
-    val articleCount: Int,
+    val postCount: Int,
     @ApiModelProperty(value = "팔로잉 수")
     val followingCount: Int,
     @ApiModelProperty(value = "팔로워 수")
     val followerCount: Int,
     @ApiModelProperty(value = "게시글 리스트")
-    val articles: List<Articles>
+    val posts: List<PostVo>
 ) {
     companion object {
-        fun of(user: User, followingCount: Int, followerCount: Int, articles: List<Articles>): ResUserPageInfo =
+        fun of(user: User, followingCount: Int, followerCount: Int, posts: List<PostVo>): ResUserPageInfo =
             ResUserPageInfo(
                 email = user.email,
                 nickname = user.nickname,
                 profileImgUrl = user.profileImgUrl,
                 introduce = user.introduce ?: "",
-                articleCount = articles.size,
+                postCount = posts.size,
                 followingCount = followingCount,
                 followerCount = followerCount,
-                articles = articles
+                posts = posts
             )
     }
 }
