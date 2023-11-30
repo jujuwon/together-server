@@ -28,14 +28,16 @@ class ImageUploader(
 
         val bytes = IOUtils.toByteArray(file.inputStream)
         objMeta.contentLength = bytes.size.toLong()
+        objMeta.contentType = file.contentType
 
         val byteArrayIs = ByteArrayInputStream(bytes)
+        val key = "${dir}/${fileName}"
 
         client.putObject(
-            PutObjectRequest(bucket, "${dir}/fileName", byteArrayIs, objMeta)
+            PutObjectRequest(bucket, key, byteArrayIs, objMeta)
                 .withCannedAcl(CannedAccessControlList.PublicRead)
         )
 
-        return client.getUrl(bucket, dir + fileName).toString()
+        return client.getUrl(bucket, key).toString()
     }
 }
