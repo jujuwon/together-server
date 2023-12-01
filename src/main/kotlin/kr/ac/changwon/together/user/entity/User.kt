@@ -13,7 +13,7 @@ class User(
     @Column
     val name: String,
     nickname: String,
-    profileImgUrl: String = "base_profile.png"
+    profileImgUrl: String
 ) : BaseTimeEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

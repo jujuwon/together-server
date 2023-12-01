@@ -8,6 +8,7 @@ import kr.ac.changwon.together.user.repository.UserRepository
 import kr.ac.changwon.together.auth.vo.ReqSignIn
 import kr.ac.changwon.together.auth.vo.ReqSignUp
 import kr.ac.changwon.together.auth.vo.ResLoginToken
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -16,6 +17,8 @@ class AuthService(
     private val userRepository: UserRepository,
     private val jwtTokenUtil: JwtTokenUtil
 ) {
+    @Value("\${custom.image.base}")
+    private lateinit var baseImageUrl: String
 
     @Transactional
     fun signUp(req: ReqSignUp): ResLoginToken = with(req) {
@@ -24,7 +27,8 @@ class AuthService(
                 email = email,
                 pwd = password,
                 name = name,
-                nickname = nickname
+                nickname = nickname,
+                profileImgUrl = baseImageUrl
             )
         )
 
