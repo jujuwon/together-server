@@ -12,7 +12,7 @@ class Post(
     @Column
     val content: String,
     user: User
-): BaseTimeEntity() {
+) : BaseTimeEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
@@ -26,8 +26,16 @@ class Post(
     var state: State = State.COMPLETE
         protected set
 
+    @OneToMany(mappedBy = "post")
+    val comments: MutableList<Comment> = mutableListOf()
+
     fun delete() {
         state = State.DELETED
+    }
+
+    // 연관관계 편의 메소드
+    fun addComment(comment: Comment) {
+        comments.add(comment)
     }
 
     companion object {

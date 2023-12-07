@@ -4,11 +4,15 @@ import kr.ac.changwon.together.common.coded.ErrorCode
 import kr.ac.changwon.together.common.exception.CustomException
 import kr.ac.changwon.together.common.util.ImageUploader
 import kr.ac.changwon.together.post.coded.State
+import kr.ac.changwon.together.post.entity.Comment
 import kr.ac.changwon.together.post.entity.Post
+import kr.ac.changwon.together.post.repository.CommentRepository
 import kr.ac.changwon.together.post.repository.PostRepository
+import kr.ac.changwon.together.post.vo.ReqCreateComment
 import kr.ac.changwon.together.post.vo.ReqCreatePost
 import kr.ac.changwon.together.post.vo.ResPost
 import kr.ac.changwon.together.post.vo.ResPostImgUrl
+import kr.ac.changwon.together.user.entity.User
 import kr.ac.changwon.together.user.repository.UserRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -19,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile
 class PostService(
     private val postRepository: PostRepository,
     private val userRepository: UserRepository,
+    private val commentRepository: CommentRepository,
     private val imageUploader: ImageUploader
 ) {
 
@@ -60,4 +65,26 @@ class PostService(
             ?.let {
                 ResPostImgUrl(imgUrl = imageUploader.upload(file))
             } ?: throw CustomException(ErrorCode.NOT_FOUND_USER)
+
+    @Transactional
+    fun createComment(userId: Long, postId: Long, req: ReqCreateComment) {
+        val user = userRepository.findByIdOrNull(userId)
+            ?: throw CustomException(ErrorCode.NOT_FOUND_USER)
+
+        val post = postRepository.findByIdOrNull(postId)
+            ?: throw CustomException(ErrorCode.NOT_FOUND_POST)
+
+        val parentComment = req.parentId?.run {
+            commentRepository.findByIdOrNull(this)
+        }
+
+        commentRepository.save(
+            Comment.create(
+                user = user,
+                post = post,
+                content = req.content,
+                comment = parentComment
+            )
+        )
+    }
 }

@@ -4,10 +4,7 @@ import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import kr.ac.changwon.together.common.vo.RestApiResponse
 import kr.ac.changwon.together.post.service.PostService
-import kr.ac.changwon.together.post.vo.ReqCreatePost
-import kr.ac.changwon.together.post.vo.ReqFavoritePost
-import kr.ac.changwon.together.post.vo.ReqLikePost
-import kr.ac.changwon.together.post.vo.ResPostImgUrl
+import kr.ac.changwon.together.post.vo.*
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.userdetails.User
 import org.springframework.web.bind.annotation.*
@@ -46,10 +43,9 @@ class PostController(
     }
 
     @ApiOperation(value = "댓글 작성 (미완료)", notes = "댓글을 작성합니다.")
-    @PostMapping("/comment")
-    fun comment() {
-        // TODO
-    }
+    @PostMapping("/{postId}/comment")
+    fun comment(@AuthenticationPrincipal user: User, @PathVariable postId: Long, @RequestBody req: ReqCreateComment) =
+        RestApiResponse.success(postService.createComment(userId = user.username.toLong(), postId = postId, req = req))
 
     @ApiOperation(value = "게시글 즐겨찾기 (미완료)", notes = "특정 게시글을 즐겨찾기 합니다.")
     @PostMapping("/{postId}/favorite")

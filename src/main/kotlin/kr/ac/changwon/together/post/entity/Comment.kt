@@ -11,12 +11,12 @@ class Comment(
     val content: String,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
-    val post: Post,
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     val user: User,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id")
+    val post: Post,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
@@ -25,8 +25,19 @@ class Comment(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
+
     @Column
     @Enumerated(value = EnumType.STRING)
     var state: State = State.COMPLETE
         protected set
+
+    companion object {
+        fun create(user: User, post: Post, comment: Comment?, content: String) =
+            Comment(
+                content = content,
+                user = user,
+                post = post,
+                comment = comment
+            ).also { post.addComment(comment = it) }
+    }
 }
