@@ -123,7 +123,7 @@ class UserService(
         }
     }
 
-    fun getOtherUserInfo(userId:Long, otherUserId: Long): ResOtherUserInfo {
+    fun getOtherUserInfo(userId: Long, otherUserId: Long): ResOtherUserInfo {
         val user = getUser(userId = userId)
         val otherUser = getUser(userId = otherUserId)
         val followerCount = followRepository.countByFollowing(following = otherUser)
@@ -147,4 +147,40 @@ class UserService(
             user = user,
             following = following
         ) != null
+
+    fun searchUser(userId: Long, keyword: String): List<ResSearchUser> =
+        // TODO 캐시 적용
+        userRepository.findByNicknameContaining(nickname = keyword)
+            .filter { it.id != userId }
+            .let { users ->
+                users.map {
+                    ResSearchUser(
+                        userId = it.id!!,
+                        nickname = it.nickname,
+                    )
+                }
+            }
+
+    fun searchFollowing(userId: Long, keyword: String): List<ResSearchUser> =
+        // TODO 캐시 적용
+        getUser(userId = userId).followings
+            .filter { it.following.nickname.contains(keyword) }
+            .map {
+                ResSearchUser(
+                    userId = it.following.id!!,
+                    nickname = it.following.nickname
+                )
+            }
+
+    fun searchFollower(userId: Long, keyword: String): List<ResSearchUser> =
+        // TODO 캐시 적용
+        followRepository.findByFollowing(
+            following = getUser(userId = userId)
+        ).filter { it.user.nickname.contains(keyword) }
+            .map {
+                ResSearchUser(
+                    userId = it.user.id!!,
+                    nickname = it.user.nickname
+                )
+            }
 }

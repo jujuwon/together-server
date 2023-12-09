@@ -42,22 +42,26 @@ class UserController(
     fun getFollowing(@AuthenticationPrincipal user: User): RestApiResponse<List<ResFriends>> =
         RestApiResponse.success(service.getFollowingList(userId = user.username.toLong()))
 
-    @ApiOperation(value = "팔로잉 검색 (미완료)", notes = "로그인한 사용자가 팔로잉한 사용자들 중 검색한 키워드가 포함되는 닉네임을 가진 사용자들의 목록을 반환합니다.")
+    @ApiOperation(value = "팔로잉 검색 (완료)", notes = "로그인한 사용자가 팔로잉한 사용자들 중 검색한 키워드가 포함되는 닉네임을 가진 사용자들의 목록을 반환합니다.")
     @GetMapping("/following/search/{keyword}")
-    fun searchFollowing(@AuthenticationPrincipal user: User, @PathVariable keyword: String) {
-        // TODO
-    }
+    fun searchFollowing(
+        @AuthenticationPrincipal user: User,
+        @PathVariable keyword: String
+    ): RestApiResponse<List<ResSearchUser>> =
+        RestApiResponse.success(service.searchFollowing(userId = user.username.toLong(), keyword = keyword))
 
     @ApiOperation(value = "팔로워 목록 (완료)", notes = "로그인한 사용자를 팔로우한 사용자들의 목록을 반환합니다.")
     @GetMapping("/follower")
     fun getFollower(@AuthenticationPrincipal user: User): RestApiResponse<List<ResFriends>> =
         RestApiResponse.success(service.getFollowerList(userId = user.username.toLong()))
 
-    @ApiOperation(value = "팔로워 검색 (미완료)", notes = "로그인한 사용자를 팔로우한 사용자들 중 검색한 키워드가 포함되는 닉네임을 가진 사용자들의 목록을 반환합니다.")
+    @ApiOperation(value = "팔로워 검색 (완료)", notes = "로그인한 사용자를 팔로우한 사용자들 중 검색한 키워드가 포함되는 닉네임을 가진 사용자들의 목록을 반환합니다.")
     @GetMapping("/follower/search/{keyword}")
-    fun searchFollower(@AuthenticationPrincipal user: User, @PathVariable keyword: String) {
-        // TODO
-    }
+    fun searchFollower(
+        @AuthenticationPrincipal user: User,
+        @PathVariable keyword: String
+    ): RestApiResponse<List<ResSearchUser>> =
+        RestApiResponse.success(service.searchFollower(userId = user.username.toLong(), keyword = keyword))
 
     @ApiOperation(value = "팔로우 (완료)", notes = "로그인한 사용자가 특정 사용자를 팔로우합니다.")
     @PostMapping("/follow/{userId}")
@@ -69,14 +73,19 @@ class UserController(
     fun unfollow(@AuthenticationPrincipal user: User, @PathVariable userId: Long) =
         RestApiResponse.success(service.unfollow(userId = user.username.toLong(), followingId = userId))
 
-    @ApiOperation(value = "홈화면 - 사용자검색", notes = "검색한 키워드가 포함되는 닉네임을 가진 사용자를 검색합니다.")
+    @ApiOperation(value = "홈화면 - 사용자검색 (완료)", notes = "검색한 키워드가 포함되는 닉네임을 가진 사용자를 검색합니다.")
     @GetMapping("/search/{keyword}")
-    fun searchUser(@AuthenticationPrincipal user: User, @PathVariable keyword: String) {
-        // TODO
-    }
+    fun searchUser(
+        @AuthenticationPrincipal user: User,
+        @PathVariable keyword: String
+    ): RestApiResponse<List<ResSearchUser>> =
+        RestApiResponse.success(service.searchUser(userId = user.username.toLong(), keyword = keyword))
 
     @ApiOperation(value = "사용자 조회 (완료)", notes = "사용자의 정보를 반환합니다.")
     @GetMapping("/{userId}")
-    fun getOtherUser(@AuthenticationPrincipal user: User, @PathVariable userId: Long): RestApiResponse<ResOtherUserInfo> =
+    fun getOtherUser(
+        @AuthenticationPrincipal user: User,
+        @PathVariable userId: Long
+    ): RestApiResponse<ResOtherUserInfo> =
         RestApiResponse.success(service.getOtherUserInfo(userId = user.username.toLong(), otherUserId = userId))
 }
