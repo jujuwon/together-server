@@ -2,6 +2,7 @@ package kr.ac.changwon.together.user.entity
 
 import kr.ac.changwon.together.common.entity.BaseTimeEntity
 import kr.ac.changwon.together.post.entity.Post
+import kr.ac.changwon.together.post.entity.PostFavorite
 import javax.persistence.*
 
 @Entity
@@ -37,6 +38,9 @@ class User(
 
     @OneToMany(mappedBy = "user")
     val posts: MutableList<Post> = mutableListOf()
+
+    @OneToMany(mappedBy = "user")
+    val favorites: MutableList<PostFavorite> = mutableListOf()
 
     fun updateInfo(nickname: String, introduce: String) {
         this.nickname = nickname

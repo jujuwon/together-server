@@ -26,10 +26,17 @@ class Comment(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
 
+    @OneToMany(mappedBy = "comment")
+    val comments: MutableList<Comment> = mutableListOf()
+
     @Column
     @Enumerated(value = EnumType.STRING)
     var state: State = State.COMPLETE
         protected set
+
+    fun addComment(comment: Comment) {
+        this.comments.add(comment)
+    }
 
     companion object {
         fun create(user: User, post: Post, comment: Comment?, content: String) =
@@ -38,6 +45,9 @@ class Comment(
                 user = user,
                 post = post,
                 comment = comment
-            ).also { post.addComment(comment = it) }
+            ).also {
+                post.addComment(comment = it)
+                comment?.addComment(comment = it)
+            }
     }
 }

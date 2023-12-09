@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation
 import kr.ac.changwon.together.common.vo.RestApiResponse
 import kr.ac.changwon.together.user.service.UserService
 import kr.ac.changwon.together.user.vo.ReqUpdateUser
+import kr.ac.changwon.together.user.vo.ResFavoritePost
 import kr.ac.changwon.together.user.vo.ResUserPageInfo
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.userdetails.User
@@ -33,11 +34,10 @@ class UserController(
     fun uploadProfileImage(@AuthenticationPrincipal user: User, @RequestPart file: MultipartFile) =
         RestApiResponse.success(service.uploadProfileImage(id = user.username.toLong(), file = file))
 
-    @ApiOperation(value = "사용자 화면 - 즐겨찾기 (미완료)", notes = "로그인한 사용자가 즐겨찾기한 게시글들을 반환합니다.")
+    @ApiOperation(value = "사용자 화면 - 즐겨찾기 (완료)", notes = "로그인한 사용자가 즐겨찾기한 게시글들을 반환합니다.")
     @GetMapping("/favorites")
-    fun getFavorites(@AuthenticationPrincipal user: User) {
-        // TODO
-    }
+    fun getFavorites(@AuthenticationPrincipal user: User): RestApiResponse<List<ResFavoritePost>> =
+        RestApiResponse.success(service.getFavorites(userId = user.username.toLong()))
 
     @ApiOperation(value = "팔로잉 목록 (미완료)", notes = "로그인한 사용자가 팔로잉한 사용자들의 목록을 반환합니다.")
     @GetMapping("/following")

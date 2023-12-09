@@ -4,12 +4,10 @@ import kr.ac.changwon.together.auth.vo.ResUserInfo
 import kr.ac.changwon.together.common.coded.ErrorCode
 import kr.ac.changwon.together.common.exception.CustomException
 import kr.ac.changwon.together.common.util.ImageUploader
+import kr.ac.changwon.together.post.entity.Comment
 import kr.ac.changwon.together.user.repository.FollowRepository
 import kr.ac.changwon.together.user.repository.UserRepository
-import kr.ac.changwon.together.user.vo.PostVo
-import kr.ac.changwon.together.user.vo.ReqUpdateUser
-import kr.ac.changwon.together.user.vo.ResProfileImgUrl
-import kr.ac.changwon.together.user.vo.ResUserPageInfo
+import kr.ac.changwon.together.user.vo.*
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -61,4 +59,27 @@ class UserService(
                 ResProfileImgUrl(profileImgUrl = it.profileImgUrl)
             } ?: throw CustomException(ErrorCode.NOT_FOUND_USER)
     }
+
+    fun getFavorites(userId: Long): List<ResFavoritePost> =
+        getUser(userId = userId).favorites.map {
+            ResFavoritePost.of(
+                post = it.post,
+                comments = it.post.comments.map { comment -> mapCommentToDto(comment) }
+            )
+        }
+
+    private fun mapCommentToDto(comment: Comment): CommentDto {
+        val subComments = comment.comments.map { mapCommentToDto(it) }
+        return CommentDto(
+            userId = comment.user.id!!,
+            nickname = comment.user.nickname,
+            commentId = comment.id!!,
+            content = comment.content,
+            subComments = subComments
+        )
+    }
+
+    private fun getUser(userId: Long) =
+        userRepository.findByIdOrNull(userId)
+            ?: throw CustomException(ErrorCode.NOT_FOUND_USER)
 }
