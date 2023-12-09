@@ -34,7 +34,7 @@ class User(
 
     // TODO 팔로잉/팔로워 연관관계 체크하기
     @OneToMany(mappedBy = "user")
-    val following: MutableSet<Follow> = mutableSetOf()
+    val followings: MutableSet<Follow> = mutableSetOf()
 
     @OneToMany(mappedBy = "user")
     val posts: MutableList<Post> = mutableListOf()
@@ -43,7 +43,7 @@ class User(
     val favorites: MutableList<PostFavorite> = mutableListOf()
 
     fun addFollowing(follow: Follow) {
-        following.add(follow)
+        followings.add(follow)
     }
 
     fun updateInfo(nickname: String, introduce: String) {

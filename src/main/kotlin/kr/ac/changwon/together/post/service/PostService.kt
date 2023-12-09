@@ -12,6 +12,7 @@ import kr.ac.changwon.together.post.repository.CommentRepository
 import kr.ac.changwon.together.post.repository.PostFavoriteRepository
 import kr.ac.changwon.together.post.repository.PostLikeRepository
 import kr.ac.changwon.together.post.repository.PostRepository
+import kr.ac.changwon.together.post.utils.mapCommentToDto
 import kr.ac.changwon.together.post.vo.*
 import kr.ac.changwon.together.user.entity.User
 import kr.ac.changwon.together.user.repository.UserRepository
@@ -130,7 +131,7 @@ class PostService(
             user = user
         ) ?: run {
             postLikeRepository.save(
-                PostLike(
+                PostLike.create(
                     post = post,
                     user = user
                 )
@@ -152,4 +153,38 @@ class PostService(
     private fun getPost(postId: Long) =
         postRepository.findByIdOrNull(postId)
             ?: throw CustomException(ErrorCode.NOT_FOUND_POST)
+
+    fun getFollowingPosts(userId: Long): ResUserPost {
+        val user = getUser(userId = userId)
+
+        return ResUserPost(posts = user.followings
+            .flatMap { it.following.posts }
+            .filter { it.state == State.COMPLETE }
+            .sortedByDescending { it.createdAt }
+            .map {
+                UserPostVo.of(
+                    post = it,
+                    isLike = it.likes.any { like -> like.user == user },
+                    isFavorite = it.favorites.any { favorite -> favorite.user == user },
+                    comments = it.comments.map { it.mapCommentToDto() }
+                )
+            })
+    }
+
+    fun getOtherUserPosts(userId: Long, otherUserId: Long): ResUserPost {
+        val user = getUser(userId = userId)
+        val otherUser = getUser(userId = otherUserId)
+
+        return ResUserPost(posts = otherUser.posts
+            .filter { it.state == State.COMPLETE }
+            .sortedByDescending { it.createdAt }
+            .map {
+                UserPostVo.of(
+                    post = it,
+                    isLike = it.likes.any { like -> like.user == user },
+                    isFavorite = it.favorites.any { favorite -> favorite.user == user },
+                    comments = it.comments.map { it.mapCommentToDto() }
+                )
+            })
+    }
 }

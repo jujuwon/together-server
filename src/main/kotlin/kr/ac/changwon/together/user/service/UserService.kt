@@ -4,8 +4,9 @@ import kr.ac.changwon.together.auth.vo.ResUserInfo
 import kr.ac.changwon.together.common.coded.ErrorCode
 import kr.ac.changwon.together.common.exception.CustomException
 import kr.ac.changwon.together.common.util.ImageUploader
-import kr.ac.changwon.together.post.entity.Comment
+import kr.ac.changwon.together.post.utils.mapCommentToDto
 import kr.ac.changwon.together.user.entity.Follow
+import kr.ac.changwon.together.user.entity.User
 import kr.ac.changwon.together.user.repository.FollowRepository
 import kr.ac.changwon.together.user.repository.UserRepository
 import kr.ac.changwon.together.user.vo.*
@@ -35,7 +36,7 @@ class UserService(
 
         return ResUserPageInfo.of(
             user = user,
-            followingCount = user.following.size,
+            followingCount = user.followings.size,
             followerCount = followerCount,
             posts = user.posts.map {
                 PostVo(
@@ -65,30 +66,19 @@ class UserService(
     }
 
     fun getFavorites(userId: Long): List<ResFavoritePost> =
-        getUser(userId = userId).favorites.map {
+        getUser(userId = userId).favorites.map { favorite ->
             ResFavoritePost.of(
-                post = it.post,
-                comments = it.post.comments.map { comment -> mapCommentToDto(comment) }
+                post = favorite.post,
+                comments = favorite.post.comments.map { it.mapCommentToDto() }
             )
         }
 
-    private fun mapCommentToDto(comment: Comment): CommentDto {
-        val subComments = comment.comments.map { mapCommentToDto(it) }
-        return CommentDto(
-            userId = comment.user.id!!,
-            nickname = comment.user.nickname,
-            commentId = comment.id!!,
-            content = comment.content,
-            subComments = subComments
-        )
-    }
-
     fun getFollowingList(userId: Long): List<ResFriends> =
         getUser(userId = userId).run {
-            following.map {
+            followings.map {
                 ResFriends(
-                    userId = it.user.id!!,
-                    nickname = it.user.nickname
+                    userId = it.following.id!!,
+                    nickname = it.following.nickname
                 )
             }
         }
@@ -132,4 +122,29 @@ class UserService(
             followRepository.delete(this)
         }
     }
+
+    fun getOtherUserInfo(userId:Long, otherUserId: Long): ResOtherUserInfo {
+        val user = getUser(userId = userId)
+        val otherUser = getUser(userId = otherUserId)
+        val followerCount = followRepository.countByFollowing(following = otherUser)
+
+        return ResOtherUserInfo.of(
+            user = otherUser,
+            followingCount = otherUser.followings.size,
+            followerCount = followerCount,
+            posts = otherUser.posts.map {
+                PostVo(
+                    id = it.id ?: throw CustomException(ErrorCode.INVALID_POST_ID),
+                    imgUrl = it.imgUrl
+                )
+            },
+            isFollowing = isFollowed(user = user, following = otherUser)
+        )
+    }
+
+    private fun isFollowed(user: User, following: User): Boolean =
+        followRepository.findByUserAndFollowing(
+            user = user,
+            following = following
+        ) != null
 }

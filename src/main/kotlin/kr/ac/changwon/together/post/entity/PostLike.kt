@@ -16,4 +16,12 @@ class PostLike(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
+
+    companion object {
+        fun create(post: Post, user: User) =
+            PostLike(
+                post = post,
+                user = user
+            ).also { post.addLike(it) }
+    }
 }

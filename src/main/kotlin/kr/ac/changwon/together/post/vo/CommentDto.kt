@@ -1,4 +1,4 @@
-package kr.ac.changwon.together.user.vo
+package kr.ac.changwon.together.post.vo
 
 import io.swagger.annotations.ApiModelProperty
 

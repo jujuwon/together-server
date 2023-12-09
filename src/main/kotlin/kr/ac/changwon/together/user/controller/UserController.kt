@@ -4,10 +4,7 @@ import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import kr.ac.changwon.together.common.vo.RestApiResponse
 import kr.ac.changwon.together.user.service.UserService
-import kr.ac.changwon.together.user.vo.ReqUpdateUser
-import kr.ac.changwon.together.user.vo.ResFavoritePost
-import kr.ac.changwon.together.user.vo.ResFriends
-import kr.ac.changwon.together.user.vo.ResUserPageInfo
+import kr.ac.changwon.together.user.vo.*
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.userdetails.User
 import org.springframework.web.bind.annotation.*
@@ -78,9 +75,8 @@ class UserController(
         // TODO
     }
 
-    @ApiOperation(value = "사용자 조회", notes = "사용자의 정보를 반환합니다.")
+    @ApiOperation(value = "사용자 조회 (완료)", notes = "사용자의 정보를 반환합니다.")
     @GetMapping("/{userId}")
-    fun getOtherUser(@PathVariable userId: Long) {
-        // TODO
-    }
+    fun getOtherUser(@AuthenticationPrincipal user: User, @PathVariable userId: Long): RestApiResponse<ResOtherUserInfo> =
+        RestApiResponse.success(service.getOtherUserInfo(userId = user.username.toLong(), otherUserId = userId))
 }

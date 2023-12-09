@@ -16,4 +16,12 @@ class PostFavorite(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
+
+    companion object {
+        fun create(post: Post, user: User) =
+            PostFavorite(
+                post = post,
+                user = user
+            ).also { post.addFavorite(it) }
+    }
 }

@@ -2,6 +2,7 @@ package kr.ac.changwon.together.user.vo
 
 import io.swagger.annotations.ApiModelProperty
 import kr.ac.changwon.together.post.entity.Post
+import kr.ac.changwon.together.post.vo.CommentDto
 import java.time.LocalDateTime
 
 data class ResFavoritePost(

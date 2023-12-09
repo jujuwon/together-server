@@ -9,17 +9,17 @@ import javax.persistence.*
 class Post(
     @Column
     val imgUrl: String,
+
     @Column
     val content: String,
-    user: User
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    val user: User
 ) : BaseTimeEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    val user: User = user
 
     @Column
     @Enumerated(value = EnumType.STRING)
@@ -29,6 +29,12 @@ class Post(
     @OneToMany(mappedBy = "post")
     val comments: MutableList<Comment> = mutableListOf()
 
+    @OneToMany(mappedBy = "post")
+    val likes: MutableSet<PostLike> = mutableSetOf()
+
+    @OneToMany(mappedBy = "post")
+    val favorites: MutableSet<PostFavorite> = mutableSetOf()
+
     fun delete() {
         state = State.DELETED
     }
@@ -36,6 +42,14 @@ class Post(
     // 연관관계 편의 메소드
     fun addComment(comment: Comment) {
         comments.add(comment)
+    }
+
+    fun addLike(like: PostLike) {
+        likes.add(like)
+    }
+
+    fun addFavorite(favorite: PostFavorite) {
+        favorites.add(favorite)
     }
 
     companion object {

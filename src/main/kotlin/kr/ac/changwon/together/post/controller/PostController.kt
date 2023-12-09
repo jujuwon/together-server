@@ -36,22 +36,36 @@ class PostController(
     fun findList(userId: Long) =
         RestApiResponse.success(postService.retrieve(userId = userId))
 
-    @ApiOperation(value = "게시글 상세 조회 (미완료)", notes = "특정 게시글의 상세 내용을 조회합니다.")
+    @ApiOperation(value = "사용자 게시글 상세 조회 (미완료)", notes = "특정 게시글의 상세 내용을 조회합니다.")
     @GetMapping("/{postId}")
     fun getPost(@PathVariable postId: Long) {
         // TODO
     }
 
+    @ApiOperation(value = "홈 화면 - 팔로잉 게시글 조회 (완료)", notes = "사용자가 팔로잉한 사용자들의 게시글 목록을 반환합니다.")
+    @GetMapping("/following")
+    fun getFollowingPosts(@AuthenticationPrincipal user: User): RestApiResponse<ResUserPost> =
+        RestApiResponse.success(postService.getFollowingPosts(userId = user.username.toLong()))
+
+    @ApiOperation(value = "특정 사용자 게시글 조회 (완료)", notes = "해당 사용자의 게시글 목록을 반환합니다.")
+    @GetMapping("/user/{userId}")
+    fun getOtherUserPosts(@AuthenticationPrincipal user: User, @PathVariable userId: Long): RestApiResponse<ResUserPost> =
+        RestApiResponse.success(postService.getOtherUserPosts(userId = user.username.toLong(), otherUserId = userId))
+
     @ApiOperation(value = "댓글 작성 (완료)", notes = "댓글을 작성합니다.")
     @PostMapping("/{postId}/comment")
-    fun comment(@AuthenticationPrincipal user: User, @PathVariable postId: Long, @Valid @RequestBody req: ReqCreateComment) =
+    fun comment(
+        @AuthenticationPrincipal user: User,
+        @PathVariable postId: Long,
+        @Valid @RequestBody req: ReqCreateComment
+    ) =
         RestApiResponse.success(postService.createComment(userId = user.username.toLong(), postId = postId, req = req))
 
     @ApiOperation(value = "게시글 즐겨찾기 (완료)", notes = "특정 게시글을 즐겨찾기 합니다.")
     @PostMapping("/{postId}/favorite")
     fun favorite(
-        @PathVariable postId: Long,
         @AuthenticationPrincipal user: User,
+        @PathVariable postId: Long,
         @Valid @RequestBody req: ReqFavoritePost
     ) =
         RestApiResponse.success(postService.favorite(userId = user.username.toLong(), postId = postId, req = req))
