@@ -42,24 +42,22 @@ class PostController(
         // TODO
     }
 
-    @ApiOperation(value = "댓글 작성 (미완료)", notes = "댓글을 작성합니다.")
+    @ApiOperation(value = "댓글 작성 (완료)", notes = "댓글을 작성합니다.")
     @PostMapping("/{postId}/comment")
-    fun comment(@AuthenticationPrincipal user: User, @PathVariable postId: Long, @RequestBody req: ReqCreateComment) =
+    fun comment(@AuthenticationPrincipal user: User, @PathVariable postId: Long, @Valid @RequestBody req: ReqCreateComment) =
         RestApiResponse.success(postService.createComment(userId = user.username.toLong(), postId = postId, req = req))
 
-    @ApiOperation(value = "게시글 즐겨찾기 (미완료)", notes = "특정 게시글을 즐겨찾기 합니다.")
+    @ApiOperation(value = "게시글 즐겨찾기 (완료)", notes = "특정 게시글을 즐겨찾기 합니다.")
     @PostMapping("/{postId}/favorite")
     fun favorite(
         @PathVariable postId: Long,
         @AuthenticationPrincipal user: User,
         @Valid @RequestBody req: ReqFavoritePost
-    ) {
-        // TODO
-    }
+    ) =
+        RestApiResponse.success(postService.favorite(userId = user.username.toLong(), postId = postId, req = req))
 
-    @ApiOperation(value = "게시글 좋아요 (미완료)", notes = "특정 게시글의 좋아요 버튼을 클릭합니다.")
+    @ApiOperation(value = "게시글 좋아요 (완료)", notes = "특정 게시글의 좋아요/좋아요 취소 버튼을 클릭합니다.")
     @PostMapping("/{postId}/like")
-    fun like(@PathVariable postId: Long, @AuthenticationPrincipal user: User, @Valid @RequestBody req: ReqLikePost) {
-        // TODO
-    }
+    fun like(@PathVariable postId: Long, @AuthenticationPrincipal user: User, @Valid @RequestBody req: ReqLikePost) =
+        RestApiResponse.success(postService.like(userId = user.username.toLong(), postId = postId, req = req))
 }

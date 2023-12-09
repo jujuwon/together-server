@@ -6,12 +6,13 @@ import kr.ac.changwon.together.common.util.ImageUploader
 import kr.ac.changwon.together.post.coded.State
 import kr.ac.changwon.together.post.entity.Comment
 import kr.ac.changwon.together.post.entity.Post
+import kr.ac.changwon.together.post.entity.PostFavorite
+import kr.ac.changwon.together.post.entity.PostLike
 import kr.ac.changwon.together.post.repository.CommentRepository
+import kr.ac.changwon.together.post.repository.PostFavoriteRepository
+import kr.ac.changwon.together.post.repository.PostLikeRepository
 import kr.ac.changwon.together.post.repository.PostRepository
-import kr.ac.changwon.together.post.vo.ReqCreateComment
-import kr.ac.changwon.together.post.vo.ReqCreatePost
-import kr.ac.changwon.together.post.vo.ResPost
-import kr.ac.changwon.together.post.vo.ResPostImgUrl
+import kr.ac.changwon.together.post.vo.*
 import kr.ac.changwon.together.user.entity.User
 import kr.ac.changwon.together.user.repository.UserRepository
 import org.springframework.data.repository.findByIdOrNull
@@ -24,13 +25,14 @@ class PostService(
     private val postRepository: PostRepository,
     private val userRepository: UserRepository,
     private val commentRepository: CommentRepository,
-    private val imageUploader: ImageUploader
+    private val postLikeRepository: PostLikeRepository,
+    private val postFavoriteRepository: PostFavoriteRepository,
+    private val imageUploader: ImageUploader,
 ) {
 
     @Transactional
     fun post(id: Long, req: ReqCreatePost) = with(req) {
-        val user = userRepository.findByIdOrNull(id)
-            ?: throw CustomException(ErrorCode.NOT_FOUND_USER)
+        val user = getUser(userId = id)
 
         postRepository.save(
             Post.create(
@@ -42,8 +44,7 @@ class PostService(
     }
 
     fun retrieve(userId: Long): List<ResPost> {
-        val user = userRepository.findByIdOrNull(userId)
-            ?: throw CustomException(ErrorCode.NOT_FOUND_USER)
+        val user = getUser(userId = userId)
 
         return user.posts
             .filter {
@@ -54,8 +55,7 @@ class PostService(
     }
 
     fun find(postId: Long) {
-        postRepository.findByIdOrNull(postId)
-            ?: throw CustomException(ErrorCode.NOT_FOUND_POST)
+        val post = getPost(postId = postId)
 
         // TODO 게시글 정보, 댓글 정보 등 상세 조회
     }
@@ -67,24 +67,89 @@ class PostService(
             } ?: throw CustomException(ErrorCode.NOT_FOUND_USER)
 
     @Transactional
-    fun createComment(userId: Long, postId: Long, req: ReqCreateComment) {
-        val user = userRepository.findByIdOrNull(userId)
-            ?: throw CustomException(ErrorCode.NOT_FOUND_USER)
-
-        val post = postRepository.findByIdOrNull(postId)
-            ?: throw CustomException(ErrorCode.NOT_FOUND_POST)
+    fun createComment(userId: Long, postId: Long, req: ReqCreateComment): Long? {
+        val user = getUser(userId = userId)
+        val post = getPost(postId = postId)
 
         val parentComment = req.parentId?.run {
             commentRepository.findByIdOrNull(this)
         }
 
-        commentRepository.save(
+        return commentRepository.save(
             Comment.create(
                 user = user,
                 post = post,
                 content = req.content,
                 comment = parentComment
             )
-        )
+        ).id
     }
+
+    @Transactional
+    fun like(userId: Long, postId: Long, req: ReqLikePost) {
+        val user = getUser(userId = userId)
+        val post = getPost(postId = postId)
+
+        if (req.isLike) saveLike(user = user, post = post)
+        else deleteLike(user = user, post = post)
+    }
+
+    @Transactional
+    fun favorite(userId: Long, postId: Long, req: ReqFavoritePost) {
+        val user = getUser(userId = userId)
+        val post = getPost(postId = postId)
+
+        if (req.isFavorite) saveFavorite(user = user, post = post)
+        else deleteFavorite(user = user, post = post)
+    }
+
+    private fun saveFavorite(user: User, post: Post) =
+        postFavoriteRepository.findByPostAndUser(
+            post = post,
+            user = user
+        ) ?: run {
+            postFavoriteRepository.save(
+                PostFavorite(
+                    post = post,
+                    user = user
+                )
+            )
+        }
+
+    private fun deleteFavorite(user: User, post: Post) =
+        postFavoriteRepository.findByPostAndUser(
+            post = post,
+            user = user
+        )?.run {
+            postFavoriteRepository.delete(this)
+        }
+
+    private fun saveLike(user: User, post: Post) =
+        postLikeRepository.findByPostAndUser(
+            post = post,
+            user = user
+        ) ?: run {
+            postLikeRepository.save(
+                PostLike(
+                    post = post,
+                    user = user
+                )
+            )
+        }
+
+    private fun deleteLike(user: User, post: Post) =
+        postLikeRepository.findByPostAndUser(
+            post = post,
+            user = user
+        )?.run {
+            postLikeRepository.delete(this)
+        }
+
+    private fun getUser(userId: Long) =
+        userRepository.findByIdOrNull(userId)
+            ?: throw CustomException(ErrorCode.NOT_FOUND_USER)
+
+    private fun getPost(postId: Long) =
+        postRepository.findByIdOrNull(postId)
+            ?: throw CustomException(ErrorCode.NOT_FOUND_POST)
 }
