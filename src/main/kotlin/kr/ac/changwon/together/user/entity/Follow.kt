@@ -14,4 +14,10 @@ class Follow(
 ) {
     @Id
     val id: Long? = null
+
+    companion object {
+        fun create(user: User, following: User): Follow =
+            Follow(user, following)
+                .also { user.addFollowing(it) }
+    }
 }

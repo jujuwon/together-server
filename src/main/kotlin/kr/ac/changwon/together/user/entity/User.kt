@@ -42,6 +42,10 @@ class User(
     @OneToMany(mappedBy = "user")
     val favorites: MutableList<PostFavorite> = mutableListOf()
 
+    fun addFollowing(follow: Follow) {
+        following.add(follow)
+    }
+
     fun updateInfo(nickname: String, introduce: String) {
         this.nickname = nickname
         this.introduce = introduce

@@ -9,4 +9,6 @@ interface FollowRepository : JpaRepository<Follow, Long> {
     fun countByUser(user: User): Long
     // user 를 팔로우한 사람의 수를 반환 (user 의 팔로워 수)
     fun countByFollowing(following: User): Int
+    fun findByFollowing(following: User): List<Follow>
+    fun findByUserAndFollowing(user: User, following: User): Follow?
 }

@@ -5,6 +5,7 @@ import kr.ac.changwon.together.common.coded.ErrorCode
 import kr.ac.changwon.together.common.exception.CustomException
 import kr.ac.changwon.together.common.util.ImageUploader
 import kr.ac.changwon.together.post.entity.Comment
+import kr.ac.changwon.together.user.entity.Follow
 import kr.ac.changwon.together.user.repository.FollowRepository
 import kr.ac.changwon.together.user.repository.UserRepository
 import kr.ac.changwon.together.user.vo.*
@@ -19,14 +20,17 @@ class UserService(
     private val followRepository: FollowRepository,
     private val imageUploader: ImageUploader
 ) {
+
+    private fun getUser(userId: Long) =
+        userRepository.findByIdOrNull(userId)
+            ?: throw CustomException(ErrorCode.NOT_FOUND_USER)
+
     fun getUserInfo(id: Long): ResUserInfo =
         userRepository.findByIdOrNull(id)?.let { ResUserInfo.of(it) }
             ?: throw CustomException(ErrorCode.NOT_VALID_USER)
 
     fun getUserPageInfo(id: Long): ResUserPageInfo {
-        val user = userRepository.findByIdOrNull(id)
-            ?: throw CustomException(ErrorCode.NOT_FOUND_USER)
-
+        val user = getUser(userId = id)
         val followerCount = followRepository.countByFollowing(following = user)
 
         return ResUserPageInfo.of(
@@ -79,7 +83,53 @@ class UserService(
         )
     }
 
-    private fun getUser(userId: Long) =
-        userRepository.findByIdOrNull(userId)
-            ?: throw CustomException(ErrorCode.NOT_FOUND_USER)
+    fun getFollowingList(userId: Long): List<ResFriends> =
+        getUser(userId = userId).run {
+            following.map {
+                ResFriends(
+                    userId = it.user.id!!,
+                    nickname = it.user.nickname
+                )
+            }
+        }
+
+    fun getFollowerList(userId: Long): List<ResFriends> =
+        getUser(userId = userId).run {
+            followRepository.findByFollowing(this)
+                .map {
+                    ResFriends(
+                        userId = it.user.id!!,
+                        nickname = it.user.nickname
+                    )
+                }
+        }
+
+    @Transactional
+    fun follow(userId: Long, followingId: Long) {
+        val user = getUser(userId = userId)
+        val following = getUser(userId = followingId)
+
+        followRepository.findByUserAndFollowing(
+            user = user,
+            following = following
+        ) ?: followRepository.save(
+            Follow.create(
+                user = user,
+                following = following
+            )
+        )
+    }
+
+    @Transactional
+    fun unfollow(userId: Long, followingId: Long) {
+        val user = getUser(userId = userId)
+        val following = getUser(userId = followingId)
+
+        followRepository.findByUserAndFollowing(
+            user = user,
+            following = following
+        )?.run {
+            followRepository.delete(this)
+        }
+    }
 }
