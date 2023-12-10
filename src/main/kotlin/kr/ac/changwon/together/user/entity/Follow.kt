@@ -13,6 +13,7 @@ class Follow(
     val following: User
 ) {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
 
     companion object {
