@@ -32,6 +32,19 @@ class AuthServiceTest(
     }
 
     context("회원가입") {
+        should("유효한 회원가입 정보 입력 시 회원가입을 성공한다") {
+            service.signUp(
+                req = ReqSignUp(
+                    email = "juwon@gmail.com",
+                    name = "이주원",
+                    nickname = "juwon-test",
+                    password = "test1234!"
+                )
+            ).run {
+                token.split(".").size shouldBe 3
+            }
+        }
+
         should("중복된 이메일 주소 입력 시 예외가 발생한다") {
             val result = {
                 service.signUp(
