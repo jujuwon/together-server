@@ -36,6 +36,11 @@ class PostController(
     fun findList(userId: Long) =
         RestApiResponse.success(postService.retrieve(userId = userId))
 
+    @ApiOperation(value = "게시글 상세 조회 (완료)", notes = "특정 게시글의 상세 정보를 조회합니다.")
+    @GetMapping("/{postId}")
+    fun findDetail(@AuthenticationPrincipal user: User, @PathVariable postId: Long): RestApiResponse<UserPostVo> =
+        RestApiResponse.success(postService.retrieveDetail(userId = user.username.toLong(), postId = postId))
+
     @ApiOperation(value = "홈 화면 - 팔로잉 게시글 조회 (완료)", notes = "사용자가 팔로잉한 사용자들의 게시글 목록을 반환합니다.")
     @GetMapping("/following")
     fun getFollowingPosts(@AuthenticationPrincipal user: User): RestApiResponse<ResUserPost> =

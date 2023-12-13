@@ -187,4 +187,16 @@ class PostService(
                 )
             })
     }
+
+    fun retrieveDetail(userId: Long, postId: Long): UserPostVo {
+        val user = getUser(userId = userId)
+        val post = getPost(postId = postId)
+
+        return UserPostVo.of(
+            post = post,
+            isLike = post.likes.any { like -> like.user == user },
+            isFavorite = post.favorites.any { favorite -> favorite.user == user },
+            comments = post.comments.map { it.mapCommentToDto() }
+        )
+    }
 }
