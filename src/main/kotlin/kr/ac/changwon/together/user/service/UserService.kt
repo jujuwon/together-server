@@ -12,6 +12,7 @@ import kr.ac.changwon.together.user.entity.User
 import kr.ac.changwon.together.user.repository.FollowRepository
 import kr.ac.changwon.together.user.repository.UserRepository
 import kr.ac.changwon.together.user.vo.*
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -23,6 +24,9 @@ class UserService(
     private val followRepository: FollowRepository,
     private val imageUploader: ImageUploader
 ) {
+
+    @Value("\${custom.image.base}")
+    private lateinit var baseImageUrl: String
 
     private fun getUser(userId: Long) =
         userRepository.findByIdOrNull(userId)
@@ -193,4 +197,10 @@ class UserService(
                     nickname = it.user.nickname
                 )
             }
+
+    @Transactional
+    fun deleteProfileImage(userId: Long) {
+        val user = getUser(userId = userId)
+        user.updateProfileImgUrl(profileImgUrl = baseImageUrl)
+    }
 }

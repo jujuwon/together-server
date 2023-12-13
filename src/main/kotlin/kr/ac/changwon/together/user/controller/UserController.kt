@@ -32,6 +32,11 @@ class UserController(
     fun uploadProfileImage(@AuthenticationPrincipal user: User, @RequestPart file: MultipartFile) =
         RestApiResponse.success(service.uploadProfileImage(id = user.username.toLong(), file = file))
 
+    @ApiOperation(value = "사용자 화면 - 프로필 이미지 삭제 (완료)", notes = "로그인한 사용자의 프로필 사진을 삭제합니다.")
+    @DeleteMapping("/info/profile-image")
+    fun deleteProfileImage(@AuthenticationPrincipal user: User) =
+        RestApiResponse.success(service.deleteProfileImage(userId = user.username.toLong()))
+
     @ApiOperation(value = "사용자 화면 - 즐겨찾기 (완료)", notes = "로그인한 사용자가 즐겨찾기한 게시글들을 반환합니다.")
     @GetMapping("/favorites")
     fun getFavorites(@AuthenticationPrincipal user: User): RestApiResponse<ResFavoritePost> =
