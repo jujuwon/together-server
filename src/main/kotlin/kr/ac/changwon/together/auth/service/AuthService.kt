@@ -22,6 +22,11 @@ class AuthService(
 
     @Transactional
     fun signUp(req: ReqSignUp): ResLoginToken = with(req) {
+        userRepository.findByEmailOrNickname(email = email, nickname = nickname)?.let {
+            if (email == it.email) throw CustomException(error = ErrorCode.ALREADY_EXIST_EMAIL)
+            if (nickname == it.nickname) throw CustomException(error = ErrorCode.ALREADY_EXIST_NICKNAME)
+        }
+
         val user = userRepository.save(
             User(
                 email = email,

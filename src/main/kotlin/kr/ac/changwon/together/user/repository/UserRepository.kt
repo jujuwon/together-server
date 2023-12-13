@@ -7,6 +7,8 @@ interface UserRepository : JpaRepository<User, Long> {
 
     fun findByEmailAndPwd(email: String, pwd: String): User?
 
+    fun findByEmailOrNickname(email: String, nickname: String): User?
+
     fun findByEmail(email: String): User?
 
     fun findByNicknameContaining(nickname: String): List<User>
