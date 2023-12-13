@@ -36,7 +36,8 @@ class AuthService(
     }
 
     fun signIn(req: ReqSignIn): ResLoginToken = with(req) {
-        return userRepository.findByEmailAndPwd(email = email, pwd = password)?.let {
+        return userRepository.findByEmail(email = email)?.let {
+            if (password != it.pwd) throw CustomException(error = ErrorCode.INVALID_PASSWORD)
             ResLoginToken(token = generateToken(id = it.id))
         } ?: throw CustomException(error = ErrorCode.NOT_FOUND_USER)
     }
