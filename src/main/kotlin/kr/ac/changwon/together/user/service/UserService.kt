@@ -4,7 +4,9 @@ import kr.ac.changwon.together.auth.vo.ResUserInfo
 import kr.ac.changwon.together.common.coded.ErrorCode
 import kr.ac.changwon.together.common.exception.CustomException
 import kr.ac.changwon.together.common.util.ImageUploader
+import kr.ac.changwon.together.post.coded.State
 import kr.ac.changwon.together.post.utils.mapCommentToDto
+import kr.ac.changwon.together.post.vo.UserPostVo
 import kr.ac.changwon.together.user.entity.Follow
 import kr.ac.changwon.together.user.entity.User
 import kr.ac.changwon.together.user.repository.FollowRepository
@@ -65,13 +67,21 @@ class UserService(
             } ?: throw CustomException(ErrorCode.NOT_FOUND_USER)
     }
 
-    fun getFavorites(userId: Long): List<ResFavoritePost> =
-        getUser(userId = userId).favorites.map { favorite ->
-            ResFavoritePost.of(
-                post = favorite.post,
-                comments = favorite.post.comments.map { it.mapCommentToDto() }
-            )
-        }
+    fun getFavorites(userId: Long): ResFavoritePost {
+        val user = getUser(userId = userId)
+
+        return ResFavoritePost(posts = user.favorites
+            .map { it.post }
+            .sortedByDescending { it.createdAt }
+            .map {
+                UserPostVo.of(
+                    post = it,
+                    isLike = it.likes.any { like -> like.user == user },
+                    isFavorite = it.favorites.any { favorite -> favorite.user == user },
+                    comments = it.comments.map { it.mapCommentToDto() }
+                )
+            })
+    }
 
     fun getFollowingList(userId: Long): List<ResFriends> =
         getUser(userId = userId).run {
