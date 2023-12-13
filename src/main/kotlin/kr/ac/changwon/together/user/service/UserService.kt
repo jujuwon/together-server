@@ -203,8 +203,9 @@ class UserService(
             }
 
     @Transactional
-    fun deleteProfileImage(userId: Long) {
+    fun deleteProfileImage(userId: Long): ResProfileImgUrl {
         val user = getUser(userId = userId)
         user.updateProfileImgUrl(profileImgUrl = baseImageUrl)
+        return ResProfileImgUrl(profileImgUrl = user.profileImgUrl)
     }
 }
