@@ -55,11 +55,15 @@ class UserService(
 
     @Transactional
     fun updateUserInfo(id: Long, req: ReqUpdateUser) = with(req) {
-        userRepository.findByIdOrNull(id)
-            ?.updateInfo(
+        userRepository.findByIdOrNull(id)?.let {
+            userRepository.findByNickname(nickname = nickname)?.let { user ->
+                if (user.id != id) throw CustomException(ErrorCode.ALREADY_EXIST_NICKNAME)
+            }
+            it.updateInfo(
                 nickname = nickname,
                 introduce = introduce
-            ) ?: throw CustomException(ErrorCode.NOT_FOUND_USER)
+            )
+        } ?: throw CustomException(ErrorCode.NOT_FOUND_USER)
     }
 
     @Transactional
