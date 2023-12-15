@@ -86,7 +86,9 @@ class UserService(
                     post = it,
                     isLike = it.likes.any { like -> like.user == user },
                     isFavorite = it.favorites.any { favorite -> favorite.user == user },
-                    comments = it.comments.map { it.mapCommentToDto() }
+                    comments = it.comments
+                        .filter { comment -> comment.comment == null }
+                        .map { comment ->  comment.mapCommentToDto() }
                 )
             })
     }

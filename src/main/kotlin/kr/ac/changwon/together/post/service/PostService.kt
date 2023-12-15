@@ -166,7 +166,9 @@ class PostService(
                     post = it,
                     isLike = it.likes.any { like -> like.user == user },
                     isFavorite = it.favorites.any { favorite -> favorite.user == user },
-                    comments = it.comments.map { it.mapCommentToDto() }
+                    comments = it.comments
+                        .filter { comment -> comment.comment == null }
+                        .map { comment ->  comment.mapCommentToDto() }
                 )
             })
     }
@@ -183,7 +185,9 @@ class PostService(
                     post = it,
                     isLike = it.likes.any { like -> like.user == user },
                     isFavorite = it.favorites.any { favorite -> favorite.user == user },
-                    comments = it.comments.map { it.mapCommentToDto() }
+                    comments = it.comments
+                        .filter { comment -> comment.comment == null }
+                        .map { comment -> comment.mapCommentToDto() }
                 )
             })
     }
@@ -196,7 +200,9 @@ class PostService(
             post = post,
             isLike = post.likes.any { like -> like.user == user },
             isFavorite = post.favorites.any { favorite -> favorite.user == user },
-            comments = post.comments.map { it.mapCommentToDto() }
+            comments = post.comments
+                .filter { comment -> comment.comment == null }
+                .map { it.mapCommentToDto() }
         )
     }
 }
